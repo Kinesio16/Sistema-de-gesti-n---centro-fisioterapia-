@@ -21,5 +21,8 @@ public interface TratamientoRepository extends JpaRepository<Tratamiento, Long> 
     List<Tratamiento> findByPacienteId(Long pacienteId);
 
     List<Tratamiento> findByFisioterapeutaId(Long fisioterapeutaId);
+    
+
+
 
 }
