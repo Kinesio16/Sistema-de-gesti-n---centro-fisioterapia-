@@ -4,6 +4,7 @@ public enum EstadoFactura {
 
     PENDIENTE,
     EMITIDA,
-    NO_REQUIERE
+    NO_REQUIERE,
+    ANULADA
 
 }

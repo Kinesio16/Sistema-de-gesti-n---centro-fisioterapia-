@@ -22,7 +22,9 @@ public interface TratamientoRepository extends JpaRepository<Tratamiento, Long> 
 
     List<Tratamiento> findByFisioterapeutaId(Long fisioterapeutaId);
     
-
+    Optional<Tratamiento> findByPacienteIdAndEstado(
+            Long pacienteId,
+            EstadoTratamiento estado);
 
 
 }
