@@ -25,6 +25,8 @@ public interface TratamientoRepository extends JpaRepository<Tratamiento, Long> 
     Optional<Tratamiento> findByPacienteIdAndEstado(
             Long pacienteId,
             EstadoTratamiento estado);
+    
+    long countByEstado(EstadoTratamiento estado);
 
 
 }

@@ -24,5 +24,11 @@ public interface SesionRepository extends JpaRepository<Sesion, Long> {
     List<Sesion> findByFechaSesion(LocalDate fechaSesion);
 
     List<Sesion> findByTratamientoIdAndEstado(Long tratamientoId, EstadoSesion estado);
+    
+    long countByFechaSesionAndEstado(LocalDate fechaSesion, EstadoSesion estado);
 
+    long countByFechaSesionBetweenAndEstado(
+            LocalDate inicio,
+            LocalDate fin,
+            EstadoSesion estado);
 }

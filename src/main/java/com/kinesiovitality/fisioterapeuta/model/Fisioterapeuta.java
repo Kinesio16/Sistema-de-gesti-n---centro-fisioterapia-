@@ -46,6 +46,7 @@ public class Fisioterapeuta {
 	@Enumerated(EnumType.STRING)
 	private EstadoRegistro estado;
 	
+	@Column(nullable = false, updatable = false)
 	private LocalDateTime fechaCreacion;
 	
 	private LocalDateTime fechaActualizacion;

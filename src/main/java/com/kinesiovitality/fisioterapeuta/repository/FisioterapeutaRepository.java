@@ -25,4 +25,6 @@ public interface FisioterapeutaRepository  extends JpaRepository<Fisioterapeuta,
 	List<Fisioterapeuta> findByEstado(EstadoRegistro estado);
 	
 	List<Fisioterapeuta> findByEspecialidad(String especialidad);
+	
+	long countByEstado(EstadoRegistro estado);
 }

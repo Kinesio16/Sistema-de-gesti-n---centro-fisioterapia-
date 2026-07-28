@@ -1,6 +1,6 @@
 package com.kinesiovitality.fisioterapeuta.mapper;
 
-import com.kinesiovitality.common.enums.EstadoRegistro;
+
 import com.kinesiovitality.fisioterapeuta.dto.FisioterapeutaRequest;
 import com.kinesiovitality.fisioterapeuta.dto.FisioterapeutaResponse;
 import com.kinesiovitality.fisioterapeuta.model.Fisioterapeuta;

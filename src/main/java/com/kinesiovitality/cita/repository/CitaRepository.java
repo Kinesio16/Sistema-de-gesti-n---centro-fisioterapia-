@@ -18,6 +18,10 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     // Agenda del día
     List<Cita> findByFecha(LocalDate fecha);
+    
+    long countByFecha(LocalDate fecha);
+
+    long countByEstadoIn(List<EstadoCita> estados);
 
     // Agenda de un fisioterapeuta
     List<Cita> findByFisioterapeutaId(Long fisioterapeutaId);
