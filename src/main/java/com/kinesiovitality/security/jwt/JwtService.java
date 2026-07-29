@@ -1,6 +1,9 @@
 package com.kinesiovitality.security.jwt;
 
 import java.nio.charset.StandardCharsets;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
@@ -58,5 +61,18 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+    
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+    
+    public LocalDateTime extractExpirationAsLocalDateTime(String token) {
+
+        return extractExpiration(token)
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
     }
 }

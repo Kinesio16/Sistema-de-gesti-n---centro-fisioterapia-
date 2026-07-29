@@ -30,19 +30,43 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/dashboard/**").hasRole("ADMIN")
-                        .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
-                        .requestMatchers("/api/servicios/**").hasRole("ADMIN")
-                        .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "FISIOTERAPEUTA")
-                        .requestMatchers("/api/pacientes/**").hasAnyRole("ADMIN", "FISIOTERAPEUTA")
-                        .requestMatchers("/api/citas/**").hasAnyRole("ADMIN", "FISIOTERAPEUTA")
-                        .requestMatchers("/api/evaluaciones/**").hasAnyRole("ADMIN", "FISIOTERAPEUTA")
-                        .requestMatchers("/api/tratamientos/**").hasAnyRole("ADMIN", "FISIOTERAPEUTA")
-                        .requestMatchers("/api/sesiones/**").hasAnyRole("ADMIN", "FISIOTERAPEUTA")
-                        .anyRequest().authenticated()
-                )
+
+                	    .requestMatchers("/api/auth/login").permitAll()
+
+                	    .requestMatchers("/swagger-ui/**",
+                	                     "/v3/api-docs/**",
+                	                     "/swagger-ui.html")
+                	        .permitAll()
+
+                	    .requestMatchers("/api/dashboard/**")
+                	        .hasRole("ADMIN")
+
+                	    .requestMatchers("/api/usuarios/**")
+                	        .hasRole("ADMIN")
+
+                	    .requestMatchers("/api/servicios/**")
+                	        .hasRole("ADMIN")
+
+                	    .requestMatchers("/api/ventas/**")
+                	        .hasAnyRole("ADMIN","FISIOTERAPEUTA")
+
+                	    .requestMatchers("/api/pacientes/**")
+                	        .hasAnyRole("ADMIN","FISIOTERAPEUTA")
+
+                	    .requestMatchers("/api/citas/**")
+                	        .hasAnyRole("ADMIN","FISIOTERAPEUTA")
+
+                	    .requestMatchers("/api/evaluaciones/**")
+                	        .hasAnyRole("ADMIN","FISIOTERAPEUTA")
+
+                	    .requestMatchers("/api/tratamientos/**")
+                	        .hasAnyRole("ADMIN","FISIOTERAPEUTA")
+
+                	    .requestMatchers("/api/sesiones/**")
+                	        .hasAnyRole("ADMIN","FISIOTERAPEUTA")
+
+                	    .anyRequest().authenticated()
+                	)
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
