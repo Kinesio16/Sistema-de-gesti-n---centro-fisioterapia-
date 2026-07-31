@@ -4,26 +4,41 @@ import java.time.LocalDateTime;
 
 import com.kinesiovitality.common.enums.EstadoRegistro;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(
+	    name = "FisioterapeutaResponse",
+	    description = "Información completa del fisioterapeuta."
+	)
 public class FisioterapeutaResponse {
 	
+	@Schema(example = "5")
 	private Long id;
 
+	@Schema(example = "Andrea")
 	private String nombres;
 
+	@Schema(example = "Gómez Pérez")
 	private String apellidos;
 
+	@Schema(example = "1724567890")
 	private String cedula;
 
+	@Schema(example = "0991234567")
 	private String celular;
 
+	@Schema(example = "andrea@kinesiovitality.com")
 	private String correo;
 
+	@Schema(example = "Traumatología Deportiva")
 	private String especialidad;
 
+	@Schema(example = "MSP-45879")
 	private String numeroLicencia;
 
 	private EstadoRegistro estado;
 
+	@Schema(description = "Fecha de creación del registro")
 	private LocalDateTime fechaCreacion;
 
 	private LocalDateTime fechaActualizacion;

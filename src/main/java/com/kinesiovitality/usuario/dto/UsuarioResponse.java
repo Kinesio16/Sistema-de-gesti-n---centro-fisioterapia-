@@ -2,18 +2,41 @@ package com.kinesiovitality.usuario.dto;
 
 import java.time.LocalDateTime;
 
-public class UsuarioResponse {
+import io.swagger.v3.oas.annotations.media.Schema;
 
+public class UsuarioResponse {
+	
+	@Schema(
+		    description = "Identificador del usuario",
+		    example = "3"
+		)
     private Long id;
 
-    private String username;
-
+	@Schema(
+		    description = "Nombre de usuario",
+		    example = "fisioterapeuta1"
+		)
+		private String username;
+	
+	@Schema(
+		    description = "Rol del usuario",
+		    example = "FISIOTERAPEUTA"
+		)
     private String rol;
-
+	
+	@Schema(
+		    description = "Indica si el usuario está activo",
+		    example = "true"
+		)
     private Boolean activo;
-
+	
+	@Schema(
+		    description = "Obliga al usuario a cambiar la contraseña en el primer inicio de sesión",
+		    example = "true"
+		)
     private Boolean debeCambiarPassword;
-
+	
+	
     private LocalDateTime fechaCreacion;
     
     

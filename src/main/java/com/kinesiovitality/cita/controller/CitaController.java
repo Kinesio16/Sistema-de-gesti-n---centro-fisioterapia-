@@ -12,13 +12,21 @@ import com.kinesiovitality.cita.dto.CitaResponse;
 import com.kinesiovitality.cita.mapper.CitaMapper;
 import com.kinesiovitality.cita.model.Cita;
 import com.kinesiovitality.cita.service.CitaService;
-import com.kinesiovitality.common.response.ApiResponse;
+import com.kinesiovitality.common.response.ApiResponseDTO;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/citas")
 @Validated
+@Tag(
+	    name = "Citas",
+	    description = "Gestión de citas entre pacientes y fisioterapeutas."
+	)
 public class CitaController {
 
     private final CitaService citaService;
@@ -27,8 +35,17 @@ public class CitaController {
         this.citaService = citaService;
     }
 
+    @Operation(
+    	    summary = "Listar citas",
+    	    description = "Obtiene el listado completo de citas registradas."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
+    	    @ApiResponse(responseCode = "401", description = "No autenticado"),
+    	    @ApiResponse(responseCode = "403", description = "Sin permisos")
+    	})
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CitaResponse>>> listar() {
+    public ResponseEntity<ApiResponseDTO<List<CitaResponse>>> listar() {
 
         List<Cita> citas = citaService.listar();
 
@@ -36,7 +53,7 @@ public class CitaController {
                 .map(CitaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<CitaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<CitaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Citas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -44,13 +61,21 @@ public class CitaController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Operation(
+    	    summary = "Buscar cita",
+    	    description = "Obtiene una cita mediante su identificador."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Cita encontrada"),
+    	    @ApiResponse(responseCode = "404", description = "Cita no encontrada")
+    	})
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CitaResponse>> buscarPorId(
+    public ResponseEntity<ApiResponseDTO<CitaResponse>> buscarPorId(
             @PathVariable Long id) {
 
         Cita cita = citaService.buscarPorId(id);
 
-        ApiResponse<CitaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<CitaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Cita encontrada.");
         response.setData(CitaMapper.toResponse(cita));
@@ -58,13 +83,21 @@ public class CitaController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+    	    summary = "Registrar cita",
+    	    description = "Registra una nueva cita."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "201", description = "Cita registrada"),
+    	    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    	})
     @PostMapping
-    public ResponseEntity<ApiResponse<CitaResponse>> guardar(
+    public ResponseEntity<ApiResponseDTO<CitaResponse>> guardar(
             @Valid @RequestBody CitaRequest request) {
 
         Cita guardada = citaService.guardar(request);
 
-        ApiResponse<CitaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<CitaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Cita registrada correctamente.");
         response.setData(CitaMapper.toResponse(guardada));
@@ -72,28 +105,44 @@ public class CitaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(
+    	    summary = "Actualizar cita",
+    	    description = "Actualiza la información de una cita."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Cita actualizada"),
+    	    @ApiResponse(responseCode = "404", description = "Cita no encontrada")
+    	})
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CitaResponse>> actualizar(
+    public ResponseEntity<ApiResponseDTO<CitaResponse>> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody CitaRequest request) {
 
         Cita actualizada = citaService.actualizar(id, request);
 
-        ApiResponse<CitaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<CitaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Cita actualizada correctamente.");
         response.setData(CitaMapper.toResponse(actualizada));
 
         return ResponseEntity.ok(response);
     }
-
+    
+    @Operation(
+    	    summary = "Cancelar cita",
+    	    description = "Marca una cita como cancelada o inactiva."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Cita cancelada"),
+    	    @ApiResponse(responseCode = "404", description = "Cita no encontrada")
+    	})
     @PatchMapping("/{id}/cancelar")
-    public ResponseEntity<ApiResponse<Void>> cancelar(
+    public ResponseEntity<ApiResponseDTO<Void>> cancelar(
             @PathVariable Long id) {
 
         citaService.cancelar(id);
 
-        ApiResponse<Void> response = new ApiResponse<>();
+        ApiResponseDTO<Void> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Cita cancelada correctamente.");
         response.setData(null);

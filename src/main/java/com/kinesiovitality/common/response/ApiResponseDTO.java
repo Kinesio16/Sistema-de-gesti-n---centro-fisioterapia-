@@ -2,32 +2,38 @@ package com.kinesiovitality.common.response;
 
 import java.time.LocalDateTime;
 
-public class ApiResponse<T> {
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Respuesta estándar de la API.")
+public class ApiResponseDTO<T> {
+	
+	@Schema(example = "true")
     private boolean success;
+	@Schema(example = "Usuario creado correctamente.")
     private String message;
+	@Schema(description = "Información devuelta por la operación.")
     private T data;
     private LocalDateTime timestamp;
 
-    public ApiResponse() {
+    public ApiResponseDTO() {
         this.timestamp = LocalDateTime.now();
     }
 
-    public ApiResponse(boolean success, String message, T data, LocalDateTime timestamp) {
+    public ApiResponseDTO(boolean success, String message, T data, LocalDateTime timestamp) {
         this.success = success;
         this.message = message;
         this.data = data;
         this.timestamp = timestamp;
     }
     
-    public ApiResponse(boolean success, String message, T data) {
+    public ApiResponseDTO(boolean success, String message, T data) {
         this.success = success;
         this.message = message;
         this.data = data;
         this.timestamp = LocalDateTime.now();
     }
     
-    public ApiResponse(boolean success, String message) {
+    public ApiResponseDTO(boolean success, String message) {
         this.success = success;
         this.message = message;
         this.timestamp = LocalDateTime.now();

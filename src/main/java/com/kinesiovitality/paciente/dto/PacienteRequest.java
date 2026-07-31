@@ -2,40 +2,78 @@ package com.kinesiovitality.paciente.dto;
 
 import java.time.LocalDate;
 
+
 import com.kinesiovitality.common.enums.Sexo;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(
+	    name = "PacienteRequest",
+	    description = "Información necesaria para registrar o actualizar un paciente."
+	)
 public class PacienteRequest {
 
 	@NotBlank(message = "Los nombres son obligatorios")
 	@Size(max = 100, message = "Los nombres no pueden superar los 100 caracteres")
+	@Schema(
+		    description = "Nombres del paciente",
+		    example = "Carlos Andrés"
+		)
 	private String nombres;
 	
 	@NotBlank(message = "Los apellidos son obligatorios")
 	@Size(max = 100, message = "Los apellidos no pueden superar los 100 caracteres")
+	@Schema(
+		    description = "Apellidos del paciente",
+		    example = "Pérez López"
+		)
 	private String apellidos;
 	
 	@NotBlank(message = "La cédula es obligatoria")
 	@Size(min = 10, max = 10, message = "La cédula debe tener 10 dígitos")
 	@Pattern(regexp = "\\d{10}", message = "La cédula solo debe contener números")
+	@Schema(
+		    description = "Número de identificación",
+		    example = "1723456789"
+		)
 	private String cedula;
 	
 	@Past(message = "La fecha de nacimiento debe ser anterior a la fecha actual")
+	@Schema(
+		    description = "Fecha de nacimiento",
+		    example = "1995-08-25"
+		)
 	private LocalDate fechaNacimiento;
 	
+	@Schema(
+		    description = "Sexo del paciente",
+		    example = "MASCULINO"
+		)
     private Sexo sexo;
     
     @NotBlank(message = "El celular es obligatorio")
     @Pattern(regexp = "09\\d{8}", message = "El celular debe tener el formato ecuatoriano (09XXXXXXXX)")
+    @Schema(
+    	    description = "Número telefónico",
+    	    example = "0998765432"
+    	)
     private String celular;
     
     @Email(message = "El correo no tiene un formato válido")
+    @Schema(
+    	    description = "Correo electrónico",
+    	    example = "carlos@gmail.com"
+    	)
     private String correo;
     
+    @Schema(
+    	    description = "Dirección del paciente",
+    	    example = "Quito - Carcelén"
+    	)
     private String direccion;
     private String ciudad;
     private String tipoSangre;

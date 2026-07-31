@@ -11,18 +11,27 @@ import org.springframework.web.bind.annotation.*;
 import com.kinesiovitality.common.enums.EstadoFactura;
 import com.kinesiovitality.common.enums.EstadoPago;
 import com.kinesiovitality.common.enums.FormaPago;
-import com.kinesiovitality.common.response.ApiResponse;
+import com.kinesiovitality.common.response.ApiResponseDTO;
 import com.kinesiovitality.venta.dto.VentaRequest;
 import com.kinesiovitality.venta.dto.VentaResponse;
 import com.kinesiovitality.venta.mapper.VentaMapper;
 import com.kinesiovitality.venta.model.Venta;
 import com.kinesiovitality.venta.service.VentaService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/ventas")
 @Validated
+@Tag(
+	    name = "Ventas",
+	    description = "Gestión de ventas y pagos realizados por los pacientes."
+	)
 public class VentaController {
 
     private final VentaService ventaService;
@@ -31,15 +40,24 @@ public class VentaController {
         this.ventaService = ventaService;
     }
 
+    @Operation(
+    	    summary = "Listar ventas",
+    	    description = "Obtiene el listado completo de ventas registradas."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Listado obtenido correctamente"),
+    	    @ApiResponse(responseCode = "401", description = "No autorizado")
+    	})
+    	@SecurityRequirement(name = "Bearer Authentication")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listar() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listar() {
 
         List<VentaResponse> response = ventaService.listar()
                 .stream()
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -47,13 +65,22 @@ public class VentaController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Operation(
+    	    summary = "Buscar venta",
+    	    description = "Obtiene una venta mediante su identificador."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Venta encontrada"),
+    	    @ApiResponse(responseCode = "404", description = "Venta no encontrada")
+    	})
+    	@SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<VentaResponse>> buscarPorId(
+    public ResponseEntity<ApiResponseDTO<VentaResponse>> buscarPorId(
             @PathVariable Long id) {
 
         Venta venta = ventaService.buscarPorId(id);
 
-        ApiResponse<VentaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Venta encontrada.");
         response.setData(VentaMapper.toResponse(venta));
@@ -61,8 +88,17 @@ public class VentaController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+    	    summary = "Registrar venta",
+    	    description = "Registra una nueva venta de servicios."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "201", description = "Venta registrada correctamente"),
+    	    @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    	})
+    	@SecurityRequirement(name = "Bearer Authentication")
     @PostMapping
-    public ResponseEntity<ApiResponse<VentaResponse>> guardar(
+    public ResponseEntity<ApiResponseDTO<VentaResponse>> guardar(
             @Valid @RequestBody VentaRequest request) {
 
         Venta venta = VentaMapper.toEntity(request);
@@ -72,7 +108,7 @@ public class VentaController {
                 request.getPacienteId(),
                 request.getServicioId());
 
-        ApiResponse<VentaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Venta registrada correctamente.");
         response.setData(VentaMapper.toResponse(guardada));
@@ -80,8 +116,17 @@ public class VentaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(
+    	    summary = "Actualizar venta",
+    	    description = "Actualiza la información de una venta."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Venta actualizada correctamente"),
+    	    @ApiResponse(responseCode = "404", description = "Venta no encontrada")
+    	})
+    	@SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<VentaResponse>> actualizar(
+    public ResponseEntity<ApiResponseDTO<VentaResponse>> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody VentaRequest request) {
 
@@ -89,7 +134,7 @@ public class VentaController {
 
         Venta actualizada = ventaService.actualizar(id, venta);
 
-        ApiResponse<VentaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Venta actualizada correctamente.");
         response.setData(VentaMapper.toResponse(actualizada));
@@ -97,13 +142,22 @@ public class VentaController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+    	    summary = "Anular venta",
+    	    description = "Realiza la anulación lógica de una venta."
+    	)
+    	@ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Venta anulada correctamente"),
+    	    @ApiResponse(responseCode = "404", description = "Venta no encontrada")
+    	})
+    	@SecurityRequirement(name = "Bearer Authentication")
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> eliminar(
+    public ResponseEntity<ApiResponseDTO<Void>> eliminar(
             @PathVariable Long id) {
 
         ventaService.eliminar(id);
 
-        ApiResponse<Void> response = new ApiResponse<>();
+        ApiResponseDTO<Void> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Venta anulada correctamente.");
 
@@ -111,7 +165,7 @@ public class VentaController {
     }
 
     @GetMapping("/paciente/{pacienteId}")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarPorPaciente(
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarPorPaciente(
             @PathVariable Long pacienteId) {
 
         List<VentaResponse> response = ventaService.listarPorPaciente(pacienteId)
@@ -119,7 +173,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -128,7 +182,7 @@ public class VentaController {
     }
 
     @GetMapping("/servicio/{servicioId}")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarPorServicio(
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarPorServicio(
             @PathVariable Long servicioId) {
 
         List<VentaResponse> response = ventaService.listarPorServicio(servicioId)
@@ -136,7 +190,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -145,7 +199,7 @@ public class VentaController {
     }
 
     @GetMapping("/forma-pago/{formaPago}")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarPorFormaPago(
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarPorFormaPago(
             @PathVariable FormaPago formaPago) {
 
         List<VentaResponse> response = ventaService.listarPorFormaPago(formaPago)
@@ -153,7 +207,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -162,7 +216,7 @@ public class VentaController {
     }
 
     @GetMapping("/estado-pago/{estado}")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarPorEstadoPago(
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarPorEstadoPago(
             @PathVariable EstadoPago estado) {
 
         List<VentaResponse> response = ventaService.listarPorEstadoPago(estado)
@@ -170,7 +224,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -179,7 +233,7 @@ public class VentaController {
     }
 
     @GetMapping("/estado-factura/{estado}")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarPorEstadoFactura(
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarPorEstadoFactura(
             @PathVariable EstadoFactura estado) {
 
         List<VentaResponse> response = ventaService.listarPorEstadoFactura(estado)
@@ -187,7 +241,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -196,7 +250,7 @@ public class VentaController {
     }
 
     @GetMapping("/fecha/{fecha}")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarPorFecha(
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarPorFecha(
             @PathVariable LocalDate fecha) {
 
         List<VentaResponse> response = ventaService.listarPorFecha(fecha)
@@ -204,7 +258,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -213,7 +267,7 @@ public class VentaController {
     }
 
     @GetMapping("/rango")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarEntreFechas(
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarEntreFechas(
             @RequestParam LocalDate inicio,
             @RequestParam LocalDate fin) {
 
@@ -222,7 +276,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas obtenidas correctamente.");
         apiResponse.setData(response);
@@ -231,7 +285,7 @@ public class VentaController {
     }
     
     @GetMapping("/hoy")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarVentasHoy() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarVentasHoy() {
 
         List<VentaResponse> response = ventaService
                 .listarVentasHoy()
@@ -239,7 +293,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas de hoy obtenidas correctamente.");
         apiResponse.setData(response);
@@ -248,7 +302,7 @@ public class VentaController {
     }
     
     @GetMapping("/semana")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarVentasSemana() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarVentasSemana() {
 
         List<VentaResponse> response = ventaService
                 .listarVentasSemanaActual()
@@ -256,7 +310,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas de la semana obtenidas correctamente.");
         apiResponse.setData(response);
@@ -265,7 +319,7 @@ public class VentaController {
     }
     
     @GetMapping("/mes")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarVentasMes() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarVentasMes() {
 
         List<VentaResponse> response = ventaService
                 .listarVentasMesActual()
@@ -273,7 +327,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas del mes obtenidas correctamente.");
         apiResponse.setData(response);
@@ -282,7 +336,7 @@ public class VentaController {
     }
     
     @GetMapping("/anio")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarVentasAnio() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarVentasAnio() {
 
         List<VentaResponse> response = ventaService
                 .listarVentasAnioActual()
@@ -290,7 +344,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Ventas del año obtenidas correctamente.");
         apiResponse.setData(response);
@@ -299,7 +353,7 @@ public class VentaController {
     }
     
     @GetMapping("/pagos-pendientes")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarPagosPendientes() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarPagosPendientes() {
 
         List<VentaResponse> response = ventaService
                 .listarPagosPendientes()
@@ -307,7 +361,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Pagos pendientes obtenidos correctamente.");
         apiResponse.setData(response);
@@ -317,7 +371,7 @@ public class VentaController {
     }
     
     @GetMapping("/facturas-pendientes")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarFacturasPendientes() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarFacturasPendientes() {
 
         List<VentaResponse> response = ventaService
                 .listarFacturasPendientes()
@@ -325,7 +379,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Facturas pendientes obtenidas correctamente.");
         apiResponse.setData(response);
@@ -335,12 +389,12 @@ public class VentaController {
     }
     
     @PatchMapping("/{id}/confirmar-pago")
-    public ResponseEntity<ApiResponse<VentaResponse>> confirmarPago(
+    public ResponseEntity<ApiResponseDTO<VentaResponse>> confirmarPago(
             @PathVariable Long id) {
 
         Venta venta = ventaService.confirmarPago(id);
 
-        ApiResponse<VentaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Pago confirmado correctamente.");
         response.setData(VentaMapper.toResponse(venta));
@@ -349,12 +403,12 @@ public class VentaController {
     }
     
     @PatchMapping("/{id}/anular-pago")
-    public ResponseEntity<ApiResponse<VentaResponse>> anularPago(
+    public ResponseEntity<ApiResponseDTO<VentaResponse>> anularPago(
             @PathVariable Long id) {
 
         Venta venta = ventaService.anularPago(id);
 
-        ApiResponse<VentaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Pago anulado correctamente.");
         response.setData(VentaMapper.toResponse(venta));
@@ -363,12 +417,12 @@ public class VentaController {
     }
     
     @PatchMapping("/{id}/emitir-factura")
-    public ResponseEntity<ApiResponse<VentaResponse>> emitirFactura(
+    public ResponseEntity<ApiResponseDTO<VentaResponse>> emitirFactura(
             @PathVariable Long id) {
 
         Venta venta = ventaService.emitirFactura(id);
 
-        ApiResponse<VentaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Factura emitida correctamente.");
         response.setData(VentaMapper.toResponse(venta));
@@ -377,12 +431,12 @@ public class VentaController {
     }
     
     @PatchMapping("/{id}/anular-factura")
-    public ResponseEntity<ApiResponse<VentaResponse>> anularFactura(
+    public ResponseEntity<ApiResponseDTO<VentaResponse>> anularFactura(
             @PathVariable Long id) {
 
         Venta venta = ventaService.anularFactura(id);
 
-        ApiResponse<VentaResponse> response = new ApiResponse<>();
+        ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);
         response.setMessage("Factura anulada correctamente.");
         response.setData(VentaMapper.toResponse(venta));
@@ -391,7 +445,7 @@ public class VentaController {
     }
     
     @GetMapping("/pagos-realizados")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarPagosRealizados() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarPagosRealizados() {
 
         List<VentaResponse> response = ventaService
                 .listarPagosRealizados()
@@ -399,7 +453,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Pagos realizados obtenidos correctamente.");
         apiResponse.setData(response);
@@ -408,7 +462,7 @@ public class VentaController {
     }
     
     @GetMapping("/facturas-emitidas")
-    public ResponseEntity<ApiResponse<List<VentaResponse>>> listarFacturasEmitidas() {
+    public ResponseEntity<ApiResponseDTO<List<VentaResponse>>> listarFacturasEmitidas() {
 
         List<VentaResponse> response = ventaService
                 .listarFacturasEmitidas()
@@ -416,7 +470,7 @@ public class VentaController {
                 .map(VentaMapper::toResponse)
                 .toList();
 
-        ApiResponse<List<VentaResponse>> apiResponse = new ApiResponse<>();
+        ApiResponseDTO<List<VentaResponse>> apiResponse = new ApiResponseDTO<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Facturas emitidas obtenidas correctamente.");
         apiResponse.setData(response);

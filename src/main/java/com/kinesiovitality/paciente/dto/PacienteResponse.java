@@ -6,17 +6,33 @@ import java.time.LocalDateTime;
 import com.kinesiovitality.common.enums.EstadoRegistro;
 import com.kinesiovitality.common.enums.Sexo;
 
-public class PacienteResponse {
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(
+	    name = "PacienteResponse",
+	    description = "Información completa de un paciente."
+	)
+public class PacienteResponse {
+	
+	@Schema(example = "15")
     private Long id;
+	@Schema(example = "Carlos Andrés")
     private String nombres;
+	@Schema(example = "Pérez López")
     private String apellidos;
+	@Schema(example = "1723456789")
     private String cedula;
     private LocalDate fechaNacimiento;
     private Sexo sexo;
+    @Schema(example = "0998765432")
     private String celular;
+    @Schema(example = "carlos@gmail.com")
     private String correo;
+    @Schema(example = "true")
     private EstadoRegistro estado;
+    @Schema(
+    	    description = "Fecha de registro del paciente"
+    	)
     private LocalDateTime fechaCreacion;
 
     public PacienteResponse() {

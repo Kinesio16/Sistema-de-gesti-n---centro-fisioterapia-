@@ -10,7 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.kinesiovitality.common.response.ApiResponse;
+import com.kinesiovitality.common.response.ApiResponseDTO;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     // Validaciones (@Valid)
     // ===============================
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidation(
+    public ResponseEntity<ApiResponseDTO<Map<String, String>>> handleValidation(
             MethodArgumentNotValidException ex) {
 
         Map<String, String> errores = new HashMap<>();
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errores.put(error.getField(), error.getDefaultMessage()));
 
-        ApiResponse<Map<String, String>> response = new ApiResponse<>();
+        ApiResponseDTO<Map<String, String>> response = new ApiResponseDTO<>();
         response.setSuccess(false);
         response.setMessage("Error de validación.");
         response.setData(errores);
@@ -40,10 +40,10 @@ public class GlobalExceptionHandler {
     // Regla de negocio
     // ===============================
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Object>> handleIllegalArgument(
+    public ResponseEntity<ApiResponseDTO<Object>> handleIllegalArgument(
             IllegalArgumentException ex) {
 
-        ApiResponse<Object> response = new ApiResponse<>();
+        ApiResponseDTO<Object> response = new ApiResponseDTO<>();
         response.setSuccess(false);
         response.setMessage(ex.getMessage());
         response.setData(null);
@@ -56,10 +56,10 @@ public class GlobalExceptionHandler {
     // Recurso no encontrado
     // ===============================
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Object>> handleNotFound(
+    public ResponseEntity<ApiResponseDTO<Object>> handleNotFound(
             ResourceNotFoundException ex) {
 
-        ApiResponse<Object> response = new ApiResponse<>();
+        ApiResponseDTO<Object> response = new ApiResponseDTO<>();
         response.setSuccess(false);
         response.setMessage(ex.getMessage());
         response.setData(null);
@@ -72,11 +72,11 @@ public class GlobalExceptionHandler {
     // Error inesperado
     // ===============================
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleException(Exception ex) {
+    public ResponseEntity<ApiResponseDTO<Object>> handleException(Exception ex) {
 
         ex.printStackTrace();
 
-        ApiResponse<Object> response = new ApiResponse<>();
+        ApiResponseDTO<Object> response = new ApiResponseDTO<>();
         response.setSuccess(false);
         response.setMessage("Ha ocurrido un error interno en el servidor.");
         response.setData(null);
