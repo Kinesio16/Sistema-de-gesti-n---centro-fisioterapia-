@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 import com.kinesiovitality.common.enums.EstadoFactura;
 import com.kinesiovitality.common.enums.EstadoPago;
 import com.kinesiovitality.common.enums.FormaPago;
+import com.kinesiovitality.fisioterapeuta.model.Fisioterapeuta;
 import com.kinesiovitality.paciente.model.Paciente;
 import com.kinesiovitality.servicio.model.Servicio;
+import com.kinesiovitality.sucursal.model.Sucursal;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
@@ -33,6 +35,12 @@ public class Venta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "servicio_id", nullable = false)
     private Servicio servicio;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+
+    @JoinColumn(name="fisioterapeuta_id")
+
+    private Fisioterapeuta fisioterapeuta;
 
     @Column(nullable = false, length = 100)
     private String nombreServicio;
@@ -82,25 +90,29 @@ public class Venta {
 
     @Column(nullable = false)
     private LocalDateTime fechaActualizacion;
+    
+    @ManyToOne
+
+    private Sucursal sucursal;
 
     
     
     public Venta() {
     }
     
-    
 
-    public Venta(Long id, String codigoVenta, Paciente paciente, Servicio servicio, String nombreServicio,
-			Integer cantidadSesiones, @NotNull @DecimalMin("0.00") BigDecimal precioUnitario,
+	public Venta(Long id, String codigoVenta, Paciente paciente, Servicio servicio, Fisioterapeuta fisioterapeuta,
+			String nombreServicio, Integer cantidadSesiones, @NotNull @DecimalMin("0.00") BigDecimal precioUnitario,
 			@NotNull @DecimalMin("0.00") BigDecimal descuento, @NotNull @DecimalMin("0.00") BigDecimal total,
 			Boolean promocion, FormaPago formaPago, EstadoPago estadoPago, EstadoFactura estadoFactura,
 			LocalDate fechaVenta, @Size(max = 500) String observaciones, LocalDateTime fechaCreacion,
-			LocalDateTime fechaActualizacion) {
+			LocalDateTime fechaActualizacion, Sucursal sucursal) {
 		super();
 		this.id = id;
 		this.codigoVenta = codigoVenta;
 		this.paciente = paciente;
 		this.servicio = servicio;
+		this.fisioterapeuta = fisioterapeuta;
 		this.nombreServicio = nombreServicio;
 		this.cantidadSesiones = cantidadSesiones;
 		this.precioUnitario = precioUnitario;
@@ -114,7 +126,16 @@ public class Venta {
 		this.observaciones = observaciones;
 		this.fechaCreacion = fechaCreacion;
 		this.fechaActualizacion = fechaActualizacion;
+		this.sucursal = sucursal;
 	}
+
+
+
+
+
+
+
+
 
 
 
@@ -188,6 +209,20 @@ public class Venta {
 	public Servicio getServicio() {
 		return servicio;
 	}
+
+
+
+	public Fisioterapeuta getFisioterapeuta() {
+		return fisioterapeuta;
+	}
+
+
+
+
+	public void setFisioterapeuta(Fisioterapeuta fisioterapeuta) {
+		this.fisioterapeuta = fisioterapeuta;
+	}
+
 
 
 
@@ -349,6 +384,16 @@ public class Venta {
 
 	public void setFechaActualizacion(LocalDateTime fechaActualizacion) {
 		this.fechaActualizacion = fechaActualizacion;
+	}
+
+
+	public Sucursal getSucursal() {
+		return sucursal;
+	}
+
+
+	public void setSucursal(Sucursal sucursal) {
+		this.sucursal = sucursal;
 	}
 
     

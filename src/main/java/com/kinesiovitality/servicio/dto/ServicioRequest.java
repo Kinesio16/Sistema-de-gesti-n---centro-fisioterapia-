@@ -21,9 +21,11 @@ public class ServicioRequest {
     @Min(value = 1, message = "La cantidad de sesiones debe ser mayor a cero.")
     private Integer cantidadSesiones;
 
-    @NotNull(message = "El precio de costo es obligatorio.")
-    @DecimalMin(value = "0.00", message = "El precio de costo debe ser mayor o igual a cero.")
-    private BigDecimal precioCosto;
+    @DecimalMin(
+    	    value = "0.00",
+    	    message = "El precio de costo debe ser mayor o igual a cero."
+    	)
+    	private BigDecimal precioCosto;
 
     @NotNull(message = "El precio de venta es obligatorio.")
     @DecimalMin(value = "0.00", message = "El precio de venta debe ser mayor o igual a cero.")

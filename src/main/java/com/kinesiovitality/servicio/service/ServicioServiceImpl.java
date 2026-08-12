@@ -88,6 +88,23 @@ public class ServicioServiceImpl implements ServicioService {
 
         servicioRepository.save(servicio);
     }
+    
+    @Override
+    public void reactivar(Long id) {
+
+        Servicio servicio = buscarPorId(id);
+
+        if (servicio.getActivo()) {
+
+            throw new IllegalArgumentException(
+                    "El servicio ya se encuentra activo.");
+        }
+
+        servicio.setActivo(true);
+
+        servicioRepository.save(servicio);
+
+    }
 
     // ==========================
     // MÉTODOS PRIVADOS
@@ -129,5 +146,7 @@ public class ServicioServiceImpl implements ServicioService {
                 Year.now().getValue(),
                 siguiente);
     }
+    
+    
 
 }

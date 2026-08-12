@@ -11,9 +11,14 @@ public interface PacienteService {
     Paciente buscarPorId(Long id);
 
     List<Paciente> listar();
+    
+    List<Paciente> listarActivos();
 
     Paciente actualizar(Long id, Paciente paciente);
 
     void eliminar(Long id);
+    
+    void reactivar(Long id);
+    
 
 }

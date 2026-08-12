@@ -106,7 +106,9 @@ public class VentaController {
         Venta guardada = ventaService.guardar(
                 venta,
                 request.getPacienteId(),
-                request.getServicioId());
+                request.getServicioId(),
+                request.getFisioterapeutaId(),
+                request.getSucursalId());
 
         ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);

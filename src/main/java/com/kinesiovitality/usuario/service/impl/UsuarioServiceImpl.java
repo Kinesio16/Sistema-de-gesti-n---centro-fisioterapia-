@@ -1,18 +1,22 @@
 package com.kinesiovitality.usuario.service.impl;
 
-import java.util.List;
+import java.util.List;  
 import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.kinesiovitality.common.enums.Rol;
 import com.kinesiovitality.usuario.dto.ActualizarPasswordRequest;
 import com.kinesiovitality.usuario.dto.UsuarioRequest;
 import com.kinesiovitality.usuario.dto.UsuarioResponse;
 import com.kinesiovitality.usuario.model.Usuario;
 import com.kinesiovitality.usuario.repository.UsuarioRepository;
 import com.kinesiovitality.usuario.service.UsuarioService;
-
+import com.kinesiovitality.usuario.dto.ActualizarUsuarioRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+ 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
@@ -55,7 +59,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponse crearUsuario(UsuarioRequest request) {
 
         if (usuarioRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Ya existe un usuario con ese nombre.");
+        	throw new IllegalArgumentException(
+        	        "Ya existe un usuario con ese nombre.");
         }
 
         Usuario usuario = new Usuario();
@@ -88,7 +93,9 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
     
     @Override
-    public UsuarioResponse actualizarUsuario(Long id, UsuarioRequest request) {
+    public UsuarioResponse actualizarUsuario(
+            Long id,
+            ActualizarUsuarioRequest request) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() ->
@@ -97,7 +104,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!usuario.getUsername().equals(request.getUsername())
                 && usuarioRepository.existsByUsername(request.getUsername())) {
 
-            throw new RuntimeException("El nombre de usuario ya existe.");
+        	throw new IllegalArgumentException(
+        	        "El nombre de usuario ya existe.");
         }
 
         usuario.setUsername(request.getUsername());
@@ -128,6 +136,35 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() ->
                         new RuntimeException("Usuario no encontrado."));
 
+        Usuario usuarioAutenticado =
+                obtenerUsuarioAutenticado();
+
+        if (usuarioAutenticado.getId().equals(usuario.getId())) {
+
+        	throw new IllegalArgumentException(
+        	        "No puede desactivar el usuario con el que ha iniciado sesión.");
+
+        }
+
+        if (usuario.getRol() == Rol.ADMIN) {
+
+            long administradoresActivos =
+
+                    usuarioRepository.countByRolAndActivo(
+
+                            Rol.ADMIN,
+
+                            true);
+
+            if (administradoresActivos <= 1) {
+
+            	throw new IllegalArgumentException(
+            	        "No puede desactivar el último administrador del sistema.");
+
+            }
+
+        }
+
         usuario.setActivo(false);
 
         usuarioRepository.save(usuario);
@@ -148,6 +185,21 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setDebeCambiarPassword(false);
 
         usuarioRepository.save(usuario);
+
+    }
+    
+   // metodos privados
+    
+    private Usuario obtenerUsuarioAutenticado() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String username = authentication.getName();
+
+        return usuarioRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuario autenticado no encontrado."));
 
     }
 

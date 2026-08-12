@@ -18,6 +18,7 @@ public class VentaMapper {
         venta.setEstadoPago(request.getEstadoPago());
         venta.setEstadoFactura(request.getEstadoFactura());
         venta.setObservaciones(request.getObservaciones());
+        
 
         return venta;
     }
@@ -36,6 +37,20 @@ public class VentaMapper {
                 venta.getPaciente().getNombres()
                 + " "
                 + venta.getPaciente().getApellidos());
+        
+        response.setFisioterapeutaId(
+                venta.getFisioterapeuta().getId());
+
+        response.setFisioterapeuta(
+                venta.getFisioterapeuta().getNombres()
+                + " "
+                + venta.getFisioterapeuta().getApellidos());
+
+        response.setSucursalId(
+                venta.getSucursal().getId());
+
+        response.setSucursal(
+                venta.getSucursal().getNombre());
 
         response.setServicioId(
                 venta.getServicio().getId());

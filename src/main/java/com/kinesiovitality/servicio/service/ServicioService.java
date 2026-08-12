@@ -19,5 +19,7 @@ public interface ServicioService {
     Servicio actualizar(Long id, Servicio servicio);
 
     void eliminar(Long id);
+    
+    void reactivar(Long id);
 
 }

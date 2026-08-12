@@ -11,9 +11,13 @@ public interface FisioterapeutaService {
     Fisioterapeuta buscarPorId(Long id);
 
     List<Fisioterapeuta> listar();
+    
+    List<Fisioterapeuta> listarActivos();
 
     Fisioterapeuta actualizar(Long id, Fisioterapeuta fisioterapeuta);
 
     void eliminar(Long id);
+    
+    void reactivar(Long id);
 
 }

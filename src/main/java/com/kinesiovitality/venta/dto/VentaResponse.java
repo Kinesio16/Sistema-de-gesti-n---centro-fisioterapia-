@@ -21,6 +21,10 @@ public class VentaResponse {
     private Long servicioId;
 
     private String nombreServicio;
+    
+    private Long fisioterapeutaId;
+
+    private String fisioterapeuta;
 
     private Integer cantidadSesiones;
 
@@ -45,6 +49,10 @@ public class VentaResponse {
     private LocalDateTime fechaCreacion;
 
     private LocalDateTime fechaActualizacion;
+    
+    private Long sucursalId;
+    
+    private String sucursal;
     
 
     public VentaResponse() {
@@ -110,6 +118,22 @@ public class VentaResponse {
 		this.nombreServicio = nombreServicio;
 	}
 
+
+	public Long getFisioterapeutaId() {
+		return fisioterapeutaId;
+	}
+
+	public void setFisioterapeutaId(Long fisioterapeutaId) {
+		this.fisioterapeutaId = fisioterapeutaId;
+	}
+
+	public String getFisioterapeuta() {
+		return fisioterapeuta;
+	}
+
+	public void setFisioterapeuta(String fisioterapeuta) {
+		this.fisioterapeuta = fisioterapeuta;
+	}
 
 	public Integer getCantidadSesiones() {
 		return cantidadSesiones;
@@ -229,7 +253,26 @@ public class VentaResponse {
 	public void setFechaActualizacion(LocalDateTime fechaActualizacion) {
 		this.fechaActualizacion = fechaActualizacion;
 	}
+	
+	
 
+	public Long getSucursalId() {
+		return sucursalId;
+	}
+
+	public void setSucursalId(Long sucursalId) {
+		this.sucursalId = sucursalId;
+	}
+
+	public String getSucursal() {
+		return sucursal;
+	}
+
+	public void setSucursal(String sucursal) {
+		this.sucursal = sucursal;
+	}
+
+	
     
     
 }

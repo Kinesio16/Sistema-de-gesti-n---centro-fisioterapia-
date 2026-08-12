@@ -193,5 +193,20 @@ public class ServicioController {
 
         return ResponseEntity.ok(response);
     }
+    
+    @PatchMapping("/{id}/reactivar")
+    public ResponseEntity<ApiResponseDTO<Void>> reactivar(
+            @PathVariable Long id) {
+
+        servicioService.reactivar(id);
+
+        ApiResponseDTO<Void> response = new ApiResponseDTO<>();
+
+        response.setSuccess(true);
+        response.setMessage("Servicio reactivado correctamente.");
+        response.setData(null);
+
+        return ResponseEntity.ok(response);
+    }
 
 }

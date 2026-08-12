@@ -17,6 +17,8 @@ public class VentaRequest {
 
     @NotNull(message = "El servicio es obligatorio.")
     private Long servicioId;
+    
+    private Long fisioterapeutaId;
 
     @DecimalMin(value = "0.00", message = "El descuento no puede ser negativo.")
     private BigDecimal descuento;
@@ -32,6 +34,8 @@ public class VentaRequest {
 
     @Size(max = 500)
     private String observaciones;
+    
+    private Long sucursalId;
 
     public VentaRequest() {
     }
@@ -52,7 +56,15 @@ public class VentaRequest {
         this.servicioId = servicioId;
     }
 
-    public BigDecimal getDescuento() {
+    public Long getFisioterapeutaId() {
+		return fisioterapeutaId;
+	}
+
+	public void setFisioterapeutaId(Long fisioterapeutaId) {
+		this.fisioterapeutaId = fisioterapeutaId;
+	}
+
+	public BigDecimal getDescuento() {
         return descuento;
     }
 
@@ -91,5 +103,13 @@ public class VentaRequest {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
+
+	public Long getSucursalId() {
+		return sucursalId;
+	}
+
+	public void setSucursalId(Long sucursalId) {
+		this.sucursalId = sucursalId;
+	}
 
 }

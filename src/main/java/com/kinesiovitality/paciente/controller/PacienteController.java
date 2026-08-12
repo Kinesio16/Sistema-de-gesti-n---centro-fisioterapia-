@@ -65,6 +65,26 @@ public class PacienteController {
         return ResponseEntity.ok(apiResponse);
     }
     
+    @GetMapping("/activos")
+    public ResponseEntity<ApiResponseDTO<List<PacienteResponse>>> listarActivos() {
+
+        List<PacienteResponse> response = pacienteService
+                .listarActivos()
+                .stream()
+                .map(PacienteMapper::toResponse)
+                .toList();
+
+        ApiResponseDTO<List<PacienteResponse>> apiResponse =
+                new ApiResponseDTO<>();
+
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("Pacientes activos obtenidos correctamente.");
+        apiResponse.setData(response);
+
+        return ResponseEntity.ok(apiResponse);
+
+    }
+    
     @Operation(
     	    summary = "Buscar paciente por ID",
     	    description = "Obtiene la información de un paciente mediante su identificador."
@@ -159,5 +179,18 @@ public class PacienteController {
 
         return ResponseEntity.ok(response);
     }
+    
+    @PatchMapping("/{id}/reactivar")
+    public ResponseEntity<ApiResponseDTO<Void>> reactivar(
+            @PathVariable Long id) {
 
+        pacienteService.reactivar(id);
+
+        ApiResponseDTO<Void> response = new ApiResponseDTO<>();
+        response.setSuccess(true);
+        response.setMessage("Paciente reactivado correctamente.");
+        response.setData(null);
+
+        return ResponseEntity.ok(response);
+    }
 }

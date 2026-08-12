@@ -1,6 +1,7 @@
 package com.kinesiovitality.paciente.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,5 +20,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     long countByEstado(EstadoRegistro estado);
 
     long countByFechaCreacionBetween(LocalDateTime inicio, LocalDateTime fin);
+    
+    List<Paciente> findByEstado(EstadoRegistro estado);
 
 }

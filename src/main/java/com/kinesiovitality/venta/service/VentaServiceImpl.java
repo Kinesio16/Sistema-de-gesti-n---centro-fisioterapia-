@@ -10,12 +10,17 @@ import org.springframework.stereotype.Service;
 
 import com.kinesiovitality.common.enums.EstadoFactura;
 import com.kinesiovitality.common.enums.EstadoPago;
+import com.kinesiovitality.common.enums.EstadoRegistro;
 import com.kinesiovitality.common.enums.FormaPago;
 import com.kinesiovitality.common.exception.ResourceNotFoundException;
+import com.kinesiovitality.fisioterapeuta.model.Fisioterapeuta;
+import com.kinesiovitality.fisioterapeuta.repository.FisioterapeutaRepository;
 import com.kinesiovitality.paciente.model.Paciente;
 import com.kinesiovitality.paciente.repository.PacienteRepository;
 import com.kinesiovitality.servicio.model.Servicio;
 import com.kinesiovitality.servicio.repository.ServicioRepository;
+import com.kinesiovitality.sucursal.model.Sucursal;
+import com.kinesiovitality.sucursal.repository.SucursalRepository;
 import com.kinesiovitality.tratamiento.business.TratamientoBusinessService;
 import com.kinesiovitality.venta.model.Venta;
 import com.kinesiovitality.venta.repository.VentaRepository;
@@ -28,28 +33,49 @@ public class VentaServiceImpl implements VentaService {
     private final VentaRepository ventaRepository;
     private final PacienteRepository pacienteRepository;
     private final ServicioRepository servicioRepository;
+    private final FisioterapeutaRepository fisioterapeutaRepository;
+
+    private final SucursalRepository sucursalRepository;
     private final TratamientoBusinessService
     tratamientoBusinessService;
 
     
 
-    public VentaServiceImpl(VentaRepository ventaRepository, PacienteRepository pacienteRepository,
-			ServicioRepository servicioRepository, TratamientoBusinessService tratamientoBusinessService) {
+    
+	public VentaServiceImpl(VentaRepository ventaRepository, PacienteRepository pacienteRepository,
+			ServicioRepository servicioRepository, FisioterapeutaRepository fisioterapeutaRepository,
+			SucursalRepository sucursalRepository, TratamientoBusinessService tratamientoBusinessService) {
 		super();
 		this.ventaRepository = ventaRepository;
 		this.pacienteRepository = pacienteRepository;
 		this.servicioRepository = servicioRepository;
+		this.fisioterapeutaRepository = fisioterapeutaRepository;
+		this.sucursalRepository = sucursalRepository;
 		this.tratamientoBusinessService = tratamientoBusinessService;
 	}
     
     @Transactional
 	@Override
-    public Venta guardar(Venta venta, Long pacienteId, Long servicioId) {
+	public Venta guardar(
+	        Venta venta,
+	        Long pacienteId,
+	        Long servicioId,
+	        Long fisioterapeutaId,
+	        Long sucursalId){
 
         Paciente paciente = buscarPaciente(pacienteId);
         Servicio servicio = buscarServicio(servicioId);
+        Fisioterapeuta fisioterapeuta =
+                buscarFisioterapeuta(fisioterapeutaId);
+
+        Sucursal sucursal =
+                buscarSucursal(sucursalId);
+      
 
         validarServicioActivo(servicio);
+        validarFisioterapeutaActivo(fisioterapeuta);
+
+        validarSucursalActiva(sucursal);
 
         BigDecimal precioUnitario = servicio.getPrecioVenta();
         BigDecimal descuento = venta.getDescuento() == null
@@ -62,6 +88,10 @@ public class VentaServiceImpl implements VentaService {
 
         venta.setPaciente(paciente);
         venta.setServicio(servicio);
+        
+        venta.setFisioterapeuta(fisioterapeuta);
+
+        venta.setSucursal(sucursal);
 
         venta.setNombreServicio(servicio.getNombre());
         venta.setCantidadSesiones(servicio.getCantidadSesiones());
@@ -349,12 +379,55 @@ public class VentaServiceImpl implements VentaService {
                         new ResourceNotFoundException("Servicio no encontrado."));
     }
 
+    private Fisioterapeuta buscarFisioterapeuta(Long id) {
+
+        return fisioterapeutaRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Fisioterapeuta no encontrado."));
+
+    }
+
+    private Sucursal buscarSucursal(Long id) {
+
+        return sucursalRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Sucursal no encontrada."));
+
+    }
     private void validarServicioActivo(Servicio servicio) {
 
         if (servicio.getActivo() == null || !servicio.getActivo()) {
             throw new IllegalArgumentException(
                     "El servicio no está disponible para la venta.");
         }
+    }
+    
+    private void validarFisioterapeutaActivo(
+            Fisioterapeuta fisioterapeuta) {
+
+        if (fisioterapeuta.getEstado() == null
+                || fisioterapeuta.getEstado() != EstadoRegistro.ACTIVO) {
+
+            throw new IllegalArgumentException(
+                    "El fisioterapeuta no está disponible para registrar ventas.");
+
+        }
+
+    }
+    
+    private void validarSucursalActiva(
+            Sucursal sucursal) {
+
+        if (sucursal.getEstado() == null
+                || sucursal.getEstado() != EstadoRegistro.ACTIVO) {
+
+            throw new IllegalArgumentException(
+                    "La sucursal no se encuentra activa.");
+
+        }
+
     }
 
     private void validarDescuento(BigDecimal precioUnitario, BigDecimal descuento) {

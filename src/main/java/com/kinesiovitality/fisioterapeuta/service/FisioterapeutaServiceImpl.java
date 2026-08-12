@@ -28,6 +28,14 @@ public class FisioterapeutaServiceImpl implements FisioterapeutaService {
         if (fisioterapeutaRepository.existsByCorreo(fisioterapeuta.getCorreo())) {
             throw new IllegalArgumentException("Ya existe un fisioterapeuta con ese correo.");
         }
+        
+        if (fisioterapeutaRepository.existsByNumeroLicencia(
+                fisioterapeuta.getNumeroLicencia())) {
+
+            throw new IllegalArgumentException(
+                "Ya existe un fisioterapeuta con ese número de licencia.");
+
+        }
 
         return fisioterapeutaRepository.save(fisioterapeuta);
     }
@@ -44,6 +52,14 @@ public class FisioterapeutaServiceImpl implements FisioterapeutaService {
     public List<Fisioterapeuta> listar() {
 
         return fisioterapeutaRepository.findAll();
+    }
+    
+    @Override
+    public List<Fisioterapeuta> listarActivos() {
+
+        return fisioterapeutaRepository.findByEstado(
+                EstadoRegistro.ACTIVO);
+
     }
 
     @Override
@@ -84,10 +100,35 @@ public class FisioterapeutaServiceImpl implements FisioterapeutaService {
     public void eliminar(Long id) {
 
         Fisioterapeuta fisioterapeuta = buscarPorId(id);
+        
+        if (fisioterapeuta.getEstado() == EstadoRegistro.INACTIVO) {
 
+            throw new IllegalArgumentException(
+                "El fisioterapeuta ya se encuentra inactivo."
+            );
+
+        }
         fisioterapeuta.setEstado(EstadoRegistro.INACTIVO);
 
         fisioterapeutaRepository.save(fisioterapeuta);
     }
+    
+    @Override
+    public void reactivar(Long id) {
 
+        Fisioterapeuta fisioterapeuta = buscarPorId(id);
+
+        if (fisioterapeuta.getEstado() == EstadoRegistro.ACTIVO) {
+
+            throw new IllegalArgumentException(
+                "El fisioterapeuta ya se encuentra activo."
+            );
+
+        }
+
+        fisioterapeuta.setEstado(EstadoRegistro.ACTIVO);
+
+        fisioterapeutaRepository.save(fisioterapeuta);
+
+    }
 }

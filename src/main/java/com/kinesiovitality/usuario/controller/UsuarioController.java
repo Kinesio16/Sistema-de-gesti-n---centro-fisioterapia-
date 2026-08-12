@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import com.kinesiovitality.usuario.dto.ActualizarUsuarioRequest;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -112,7 +114,7 @@ public class UsuarioController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseDTO<UsuarioResponse>> actualizarUsuario(
             @PathVariable Long id,
-            @Valid @RequestBody UsuarioRequest request) {
+            @Valid @RequestBody ActualizarUsuarioRequest request) {
 
         return ResponseEntity.ok(
                 new ApiResponseDTO<>(

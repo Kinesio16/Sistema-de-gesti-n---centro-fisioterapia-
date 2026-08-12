@@ -70,6 +70,25 @@ public class FisioterapeutaController {
 		return ResponseEntity.ok(apiResponse);
 	}
 	
+	@GetMapping("/activos")
+	public ResponseEntity<ApiResponseDTO<List<FisioterapeutaResponse>>> listarActivos() {
+
+	    List<FisioterapeutaResponse> response = fisioterapeutaService
+	            .listarActivos()
+	            .stream()
+	            .map(FisioterapeutaMapper::toResponse)
+	            .toList();
+
+	    ApiResponseDTO<List<FisioterapeutaResponse>> apiResponse =
+	            new ApiResponseDTO<>();
+
+	    apiResponse.setSuccess(true);
+	    apiResponse.setMessage("Fisioterapeutas activos obtenidos correctamente.");
+	    apiResponse.setData(response);
+
+	    return ResponseEntity.ok(apiResponse);
+
+	}
 	@Operation(
 		    summary = "Buscar fisioterapeuta",
 		    description = "Obtiene un fisioterapeuta mediante su identificador."
@@ -163,4 +182,28 @@ public class FisioterapeutaController {
 		
 		return ResponseEntity.ok(response);
 	}
+	
+	@Operation(
+	        summary = "Reactivar fisioterapeuta",
+	        description = "Reactiva un fisioterapeuta previamente inactivado."
+	)
+	@ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "Reactivado correctamente"),
+	        @ApiResponse(responseCode = "404", description = "No encontrado")
+	})
+	@SecurityRequirement(name = "Bearer Authentication")
+	@PatchMapping("/{id}/reactivar")
+	public ResponseEntity<ApiResponseDTO<Void>> reactivar(@PathVariable Long id) {
+
+	    fisioterapeutaService.reactivar(id);
+
+	    ApiResponseDTO<Void> response = new ApiResponseDTO<>();
+	    response.setSuccess(true);
+	    response.setMessage("Fisioterapeuta reactivado correctamente.");
+	    response.setData(null);
+
+	    return ResponseEntity.ok(response);
+
+	}
+	
 }

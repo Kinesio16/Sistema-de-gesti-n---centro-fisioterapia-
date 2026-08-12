@@ -10,9 +10,11 @@ import com.kinesiovitality.venta.model.Venta;
 
 public interface VentaService {
 
-    Venta guardar(Venta venta,
-                  Long pacienteId,
-                  Long servicioId);
+	Venta guardar(Venta venta,
+            Long pacienteId,
+            Long servicioId,
+            Long fisioterapeutaId,
+            Long sucursalId);
 
     Venta buscarPorId(Long id);
 

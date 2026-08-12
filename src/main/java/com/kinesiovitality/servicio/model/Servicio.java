@@ -37,7 +37,7 @@ public class Servicio {
 
     @NotNull(message = "El precio de costo es obligatorio.")
     @DecimalMin(value = "0.00")
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal precioCosto;
 
     @NotNull(message = "El precio de venta es obligatorio.")
