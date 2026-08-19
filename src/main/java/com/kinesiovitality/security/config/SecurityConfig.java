@@ -1,6 +1,6 @@
 package com.kinesiovitality.security.config;
 
-import org.springframework.context.annotation.Bean; 
+import org.springframework.context.annotation.Bean;  
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 import java.util.List;
 
@@ -49,8 +50,23 @@ public class SecurityConfig {
 
                 	    .requestMatchers("/api/usuarios/**")
                 	        .hasRole("ADMIN")
+                	        
+                	        .requestMatchers(HttpMethod.GET, "/api/servicios/activos")
+                	        .hasAnyRole("ADMIN", "FISIOTERAPEUTA")
+
+	                	    .requestMatchers(HttpMethod.GET, "/api/fisioterapeutas/activos")
+	                	        .hasAnyRole("ADMIN", "FISIOTERAPEUTA")
+	
+	                	    .requestMatchers(HttpMethod.GET, "/api/sucursales/activas")
+	                	        .hasAnyRole("ADMIN", "FISIOTERAPEUTA")
 
                 	    .requestMatchers("/api/servicios/**")
+                	        .hasRole("ADMIN")
+                	    
+                	    .requestMatchers("/api/fisioterapeutas/**")
+                	        .hasRole("ADMIN")
+
+                	    .requestMatchers("/api/sucursales/**")
                 	        .hasRole("ADMIN")
 
                 	    .requestMatchers("/api/ventas/**")
