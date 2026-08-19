@@ -353,6 +353,7 @@ Correo:
 - Módulos funcionales
 - Base de datos integrada
 - Listo para el desarrollo del Frontend en React.
+- Última actualización: Agosto 2026.
 
 ---
 
