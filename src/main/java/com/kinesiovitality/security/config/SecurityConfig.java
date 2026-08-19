@@ -1,6 +1,7 @@
 package com.kinesiovitality.security.config;
 
 import org.springframework.context.annotation.Bean;  
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.http.HttpMethod;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -23,6 +25,9 @@ import com.kinesiovitality.security.filter.JwtAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
+	
+	@Value("${FRONTEND_URL:http://localhost:5173}")
+	private String frontendUrl;
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -109,8 +114,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:5173"
-        ));
+        	    frontendUrl,
+        	    "http://localhost:5173"
+        	));
 
         configuration.setAllowedMethods(List.of(
                 "GET",
