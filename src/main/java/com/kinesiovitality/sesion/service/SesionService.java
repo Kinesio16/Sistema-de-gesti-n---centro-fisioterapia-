@@ -21,4 +21,6 @@ public interface SesionService {
     Sesion cancelar(Long id);
 
     Sesion noAsistio(Long id);
+    
+    void eliminar(Long id);
 }

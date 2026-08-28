@@ -189,6 +189,19 @@ public class SesionController {
 
         return ResponseEntity.ok(response);
     }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponseDTO<Void>> eliminar(
+            @PathVariable Long id) {
+
+        sesionService.eliminar(id);
+
+        ApiResponseDTO<Void> response = new ApiResponseDTO<>();
+        response.setSuccess(true);
+        response.setMessage("Sesión eliminada correctamente.");
+
+        return ResponseEntity.ok(response);
+    }
 
     @PatchMapping("/{id}/no-asistio")
     public ResponseEntity<ApiResponseDTO<SesionResponse>> noAsistio(

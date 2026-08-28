@@ -2,6 +2,7 @@ package com.kinesiovitality.sesion.service;
 
 
 import java.time.Year;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -13,20 +14,24 @@ import com.kinesiovitality.sesion.model.Sesion;
 import com.kinesiovitality.sesion.repository.SesionRepository;
 import com.kinesiovitality.tratamiento.model.Tratamiento;
 import com.kinesiovitality.tratamiento.repository.TratamientoRepository;
+import com.kinesiovitality.tratamiento.business.TratamientoBusinessService;
 
 @Service
 public class SesionServiceImpl implements SesionService {
 
-    private final SesionRepository sesionRepository;
-    private final TratamientoRepository tratamientoRepository;
+	private final SesionRepository sesionRepository;
+	private final TratamientoRepository tratamientoRepository;
+	private final TratamientoBusinessService tratamientoBusinessService;
 
-    public SesionServiceImpl(
-            SesionRepository sesionRepository,
-            TratamientoRepository tratamientoRepository) {
+	public SesionServiceImpl(
+	        SesionRepository sesionRepository,
+	        TratamientoRepository tratamientoRepository,
+	        TratamientoBusinessService tratamientoBusinessService) {
 
-        this.sesionRepository = sesionRepository;
-        this.tratamientoRepository = tratamientoRepository;
-    }
+	    this.sesionRepository = sesionRepository;
+	    this.tratamientoRepository = tratamientoRepository;
+	    this.tratamientoBusinessService = tratamientoBusinessService;
+	}
 
     @Override
     public Sesion guardar(Sesion sesion, Long tratamientoId) {
@@ -90,39 +95,27 @@ public class SesionServiceImpl implements SesionService {
         Sesion sesion = buscarPorId(id);
 
         if (sesion.getEstado() == EstadoSesion.REALIZADA) {
-            throw new IllegalArgumentException("La sesión ya fue registrada como realizada.");
+            throw new IllegalArgumentException(
+                    "La sesión ya fue registrada como realizada.");
         }
 
         if (sesion.getEstado() == EstadoSesion.CANCELADA) {
-            throw new IllegalArgumentException("No es posible realizar una sesión cancelada.");
+            throw new IllegalArgumentException(
+                    "No es posible realizar una sesión cancelada.");
         }
 
         if (sesion.getEstado() == EstadoSesion.NO_ASISTIO) {
-            throw new IllegalArgumentException("No es posible marcar como realizada una sesión con inasistencia.");
-        }
-
-        Tratamiento tratamiento = sesion.getTratamiento();
-
-        validarTratamientoActivo(tratamiento);
-
-        Integer realizadasActuales = tratamiento.getSesionesRealizadas() == null
-                ? 0
-                : tratamiento.getSesionesRealizadas();
-
-        Integer planificadas = tratamiento.getSesionesPlanificadas() == null
-                ? 0
-                : tratamiento.getSesionesPlanificadas();
-
-        if (realizadasActuales >= planificadas) {
             throw new IllegalArgumentException(
-                    "El tratamiento ya alcanzó el número de sesiones planificadas.");
+                    "No es posible marcar como realizada una sesión con inasistencia.");
         }
+
+        validarTratamientoActivo(sesion.getTratamiento());
 
         sesion.setEstado(EstadoSesion.REALIZADA);
+
         sesionRepository.save(sesion);
 
-        tratamiento.setSesionesRealizadas(realizadasActuales + 1);
-        tratamientoRepository.save(tratamiento);
+        tratamientoBusinessService.registrarSesion(sesion);
 
         return sesion;
     }
@@ -190,6 +183,23 @@ public class SesionServiceImpl implements SesionService {
         sesion.setEstado(EstadoSesion.NO_ASISTIO);
 
         return sesionRepository.save(sesion);
+    }
+    
+    @Override
+    public void eliminar(Long id) {
+
+        Sesion sesion = buscarPorId(id);
+
+        // Si la sesión ya fue realizada,
+        // debemos devolver la sesión al tratamiento.
+        if (sesion.getEstado() == EstadoSesion.REALIZADA) {
+
+            tratamientoBusinessService.eliminarSesion(sesion);
+
+        }
+
+        sesionRepository.delete(sesion);
+
     }
 
     private Tratamiento buscarTratamiento(Long id) {

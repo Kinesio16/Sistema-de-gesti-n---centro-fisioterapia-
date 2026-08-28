@@ -146,10 +146,21 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
 
         Venta venta = buscarPorId(id);
 
+        // No permitir anular dos veces
+        if (venta.getEstadoPago() == EstadoPago.ANULADO) {
+            throw new IllegalArgumentException(
+                    "La venta ya fue anulada.");
+        }
+
+        // Primero revertimos el tratamiento
+        tratamientoBusinessService.revertirVenta(venta);
+
+        // Luego anulamos la venta
         venta.setEstadoPago(EstadoPago.ANULADO);
 
         if (venta.getEstadoFactura() == EstadoFactura.PENDIENTE) {

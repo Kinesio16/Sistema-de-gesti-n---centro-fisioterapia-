@@ -1,6 +1,7 @@
 package com.kinesiovitality.dashboard.service;
 
 import java.math.BigDecimal;
+
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ import com.kinesiovitality.tratamiento.repository.TratamientoRepository;
 import com.kinesiovitality.sesion.repository.SesionRepository;
 import com.kinesiovitality.venta.model.Venta;
 import com.kinesiovitality.venta.repository.VentaRepository;
+import com.kinesiovitality.common.enums.EstadoPago;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -118,10 +120,29 @@ public class DashboardServiceImpl implements DashboardService {
                                 EstadoCita.CONFIRMADA)));
 
         // Ventas
-        List<Venta> ventasHoy = ventaRepository.findByFechaVenta(hoy);
-        List<Venta> ventasSemana = ventaRepository.findByFechaVentaBetween(inicioSemana, finSemana);
-        List<Venta> ventasMes = ventaRepository.findByFechaVentaBetween(inicioMes, finMes);
-        List<Venta> ventasAnio = ventaRepository.findByFechaVentaBetween(inicioAnio, finAnio);
+     // Ventas (solo las que NO están anuladas)
+        List<Venta> ventasHoy =
+                ventaRepository.findByFechaVentaAndEstadoPagoNot(
+                        hoy,
+                        EstadoPago.ANULADO);
+
+        List<Venta> ventasSemana =
+                ventaRepository.findByFechaVentaBetweenAndEstadoPagoNot(
+                        inicioSemana,
+                        finSemana,
+                        EstadoPago.ANULADO);
+
+        List<Venta> ventasMes =
+                ventaRepository.findByFechaVentaBetweenAndEstadoPagoNot(
+                        inicioMes,
+                        finMes,
+                        EstadoPago.ANULADO);
+
+        List<Venta> ventasAnio =
+                ventaRepository.findByFechaVentaBetweenAndEstadoPagoNot(
+                        inicioAnio,
+                        finAnio,
+                        EstadoPago.ANULADO);
 
         response.setVentasHoy((long) ventasHoy.size());
         response.setVentasSemana((long) ventasSemana.size());
