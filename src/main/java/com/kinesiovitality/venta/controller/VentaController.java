@@ -134,7 +134,15 @@ public class VentaController {
 
         Venta venta = VentaMapper.toEntity(request);
 
-        Venta actualizada = ventaService.actualizar(id, venta);
+        Venta actualizada =
+                ventaService.actualizar(
+                        id,
+                        venta,
+                        request.getPacienteId(),
+                        request.getServicioId(),
+                        request.getFisioterapeutaId(),
+                        request.getSucursalId()
+                );
 
         ApiResponseDTO<VentaResponse> response = new ApiResponseDTO<>();
         response.setSuccess(true);

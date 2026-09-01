@@ -20,8 +20,13 @@ public interface VentaService {
 
     List<Venta> listar();
 
-    Venta actualizar(Long id,
-                     Venta venta);
+    Venta actualizar(
+            Long id,
+            Venta venta,
+            Long pacienteId,
+            Long servicioId,
+            Long fisioterapeutaId,
+            Long sucursalId);
 
     void eliminar(Long id);
 
