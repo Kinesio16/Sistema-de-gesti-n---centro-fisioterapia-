@@ -53,6 +53,7 @@ public class TratamientoServiceImpl implements TratamientoService {
         Evaluacion evaluacion = buscarEvaluacion(evaluacionId);
 
         validarEvaluacionPaciente(evaluacion, paciente);
+        validarFechaInicio(tratamiento.getFechaInicio());
 
         tratamiento.setPaciente(paciente);
         tratamiento.setFisioterapeuta(fisioterapeuta);
@@ -130,6 +131,7 @@ public class TratamientoServiceImpl implements TratamientoService {
         Evaluacion evaluacion = buscarEvaluacion(evaluacionId);
 
         validarEvaluacionPaciente(evaluacion, paciente);
+        validarFechaInicio(tratamiento.getFechaInicio());
 
         existente.setPaciente(paciente);
         existente.setFisioterapeuta(fisioterapeuta);
@@ -314,6 +316,22 @@ public class TratamientoServiceImpl implements TratamientoService {
 	            "TR-%d-%s",
 	            java.time.Year.now().getValue(),
 	            identificador);
+	}
+	
+	private void validarFechaInicio(LocalDate fechaInicio) {
+
+	    LocalDate hoy = LocalDate.now();
+	    LocalDate limite = hoy.minusDays(15);
+
+	    if (fechaInicio.isBefore(limite)) {
+	        throw new IllegalArgumentException(
+	                "Solo se permiten registrar tratamientos con una antigüedad máxima de 15 días.");
+	    }
+
+	    if (fechaInicio.isAfter(hoy)) {
+	        throw new IllegalArgumentException(
+	                "La fecha de inicio no puede ser posterior a la fecha actual.");
+	    }
 	}
 	
 	

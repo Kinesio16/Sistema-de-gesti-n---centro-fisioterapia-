@@ -126,20 +126,78 @@ public class VentaServiceImpl implements VentaService {
 
         return ventaRepository.findAll();
     }
-
+    
+    
+    @Transactional
     @Override
-    public Venta actualizar(Long id, Venta venta) {
+    public Venta actualizar(
+            Long id,
+            Venta venta,
+            Long pacienteId,
+            Long servicioId,
+            Long fisioterapeutaId,
+            Long sucursalId) {
 
         Venta existente = buscarPorId(id);
-
         if (existente.getEstadoPago() == EstadoPago.ANULADO) {
             throw new IllegalArgumentException(
                     "No es posible actualizar una venta anulada.");
         }
+        Paciente paciente = buscarPaciente(pacienteId);
 
+        Servicio servicio = buscarServicio(servicioId);
+
+        Fisioterapeuta fisioterapeuta =
+                buscarFisioterapeuta(fisioterapeutaId);
+
+        Sucursal sucursal =
+                buscarSucursal(sucursalId);
+        
+        validarServicioActivo(servicio);
+
+        validarFisioterapeutaActivo(fisioterapeuta);
+
+        validarSucursalActiva(sucursal);
+        
+        BigDecimal precioUnitario = servicio.getPrecioVenta();
+
+        BigDecimal descuento =
+                venta.getDescuento() == null
+                        ? BigDecimal.ZERO
+                        : venta.getDescuento();
+
+        validarDescuento(precioUnitario, descuento);
+
+        BigDecimal total =
+                precioUnitario.subtract(descuento);
+
+
+     // Relaciones
+        existente.setPaciente(paciente);
+        existente.setServicio(servicio);
+        existente.setFisioterapeuta(fisioterapeuta);
+        existente.setSucursal(sucursal);
+
+        // Datos del servicio
+        existente.setNombreServicio(servicio.getNombre());
+        existente.setCantidadSesiones(servicio.getCantidadSesiones());
+
+        // Valores económicos
+        existente.setPrecioUnitario(precioUnitario);
+        existente.setDescuento(descuento);
+        existente.setTotal(total);
+
+        // Promoción
+        existente.setPromocion(
+                descuento.compareTo(BigDecimal.ZERO) > 0
+        );
+
+        // Estados
         existente.setFormaPago(venta.getFormaPago());
         existente.setEstadoPago(venta.getEstadoPago());
         existente.setEstadoFactura(venta.getEstadoFactura());
+
+        // Observaciones
         existente.setObservaciones(venta.getObservaciones());
 
         return ventaRepository.save(existente);
