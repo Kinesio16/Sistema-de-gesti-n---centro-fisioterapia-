@@ -44,4 +44,17 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
     
     boolean existsByPacienteIdAndEstadoPago(Long pacienteId,
             EstadoPago estadoPago);
+    
+ // NUEVOS MÉTODOS PARA EL DASHBOARD POR SUCURSAL
+    
+    List<Venta> findBySucursalIdAndFechaVentaAndEstadoPagoNot(
+            Long sucursalId,
+            LocalDate fechaVenta,
+            EstadoPago estadoPago);
+
+    List<Venta> findBySucursalIdAndFechaVentaBetweenAndEstadoPagoNot(
+            Long sucursalId,
+            LocalDate inicio,
+            LocalDate fin,
+            EstadoPago estadoPago);
 }

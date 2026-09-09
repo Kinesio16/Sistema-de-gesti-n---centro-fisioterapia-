@@ -2,6 +2,8 @@ package com.kinesiovitality.dashboard.dto;
 
 import java.math.BigDecimal;
 
+import java.util.List;
+
 public class DashboardResponse {
 
     // ===========================
@@ -79,6 +81,15 @@ public class DashboardResponse {
     private Long citasHoy;
 
     private Long citasPendientes;
+    
+ // ===========================
+ // VENTAS POR SUCURSAL
+ // ===========================
+    
+    private List<ResumenSucursalResponse> ventasPorSucursal;
+    
+    
+    
 
     public DashboardResponse() {
     }
@@ -283,6 +294,14 @@ public class DashboardResponse {
 
 	public void setCitasPendientes(Long citasPendientes) {
 		this.citasPendientes = citasPendientes;
+	}
+	
+	public List<ResumenSucursalResponse> getVentasPorSucursal() {
+	    return ventasPorSucursal;
+	}
+
+	public void setVentasPorSucursal(List<ResumenSucursalResponse> ventasPorSucursal) {
+	    this.ventasPorSucursal = ventasPorSucursal;
 	}
 
 	

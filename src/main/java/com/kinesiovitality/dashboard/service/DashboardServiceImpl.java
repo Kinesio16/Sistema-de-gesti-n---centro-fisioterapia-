@@ -2,12 +2,14 @@ package com.kinesiovitality.dashboard.service;
 
 import java.math.BigDecimal;
 
+
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,9 @@ import com.kinesiovitality.sesion.repository.SesionRepository;
 import com.kinesiovitality.venta.model.Venta;
 import com.kinesiovitality.venta.repository.VentaRepository;
 import com.kinesiovitality.common.enums.EstadoPago;
+import com.kinesiovitality.sucursal.repository.SucursalRepository;
+import com.kinesiovitality.sucursal.model.Sucursal;
+import com.kinesiovitality.dashboard.dto.ResumenSucursalResponse;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -35,6 +40,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final SesionRepository sesionRepository;
     private final VentaRepository ventaRepository;
     private final CitaRepository citaRepository;
+    private final SucursalRepository sucursalRepository;
 
     public DashboardServiceImpl(
             PacienteRepository pacienteRepository,
@@ -42,7 +48,8 @@ public class DashboardServiceImpl implements DashboardService {
             TratamientoRepository tratamientoRepository,
             SesionRepository sesionRepository,
             VentaRepository ventaRepository,
-            CitaRepository citaRepository) {
+            CitaRepository citaRepository,
+            SucursalRepository sucursalRepository){
 
         this.pacienteRepository = pacienteRepository;
         this.fisioterapeutaRepository = fisioterapeutaRepository;
@@ -50,6 +57,7 @@ public class DashboardServiceImpl implements DashboardService {
         this.sesionRepository = sesionRepository;
         this.ventaRepository = ventaRepository;
         this.citaRepository = citaRepository;
+        this.sucursalRepository = sucursalRepository;
     }
 
     @Override
@@ -175,6 +183,40 @@ public class DashboardServiceImpl implements DashboardService {
      // contar únicamente las ventas de tipo PAQUETE.
      response.setPaquetesVendidosMes(response.getVentasMes());
 
+     
+     List<ResumenSucursalResponse> resumenesSucursal = new ArrayList<>();
+
+     List<Sucursal> sucursales =
+             sucursalRepository.findByEstado(EstadoRegistro.ACTIVO);
+
+     for (Sucursal sucursal : sucursales) {
+
+         resumenesSucursal.add(
+
+                 calcularResumenSucursal(
+
+                         sucursal.getId(),
+                         sucursal.getNombre(),
+
+                         hoy,
+
+                         inicioSemana,
+                         finSemana,
+
+                         inicioMes,
+                         finMes,
+
+                         inicioAnio,
+                         finAnio
+
+                 )
+
+         );
+
+     }
+
+     response.setVentasPorSucursal(resumenesSucursal);
+     
         return response;
     }
 
@@ -189,5 +231,78 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         return total;
+    }
+    
+    private ResumenSucursalResponse calcularResumenSucursal(
+            Long sucursalId,
+            String nombreSucursal,
+            LocalDate hoy,
+            LocalDate inicioSemana,
+            LocalDate finSemana,
+            LocalDate inicioMes,
+            LocalDate finMes,
+            LocalDate inicioAnio,
+            LocalDate finAnio) {
+
+        ResumenSucursalResponse resumen = new ResumenSucursalResponse();
+
+        resumen.setSucursalId(sucursalId);
+        resumen.setNombreSucursal(nombreSucursal);
+
+        List<Venta> ventasHoy =
+                ventaRepository.findBySucursalIdAndFechaVentaAndEstadoPagoNot(
+                        sucursalId,
+                        hoy,
+                        EstadoPago.ANULADO);
+
+        List<Venta> ventasSemana =
+                ventaRepository.findBySucursalIdAndFechaVentaBetweenAndEstadoPagoNot(
+                        sucursalId,
+                        inicioSemana,
+                        finSemana,
+                        EstadoPago.ANULADO);
+
+        List<Venta> ventasMes =
+                ventaRepository.findBySucursalIdAndFechaVentaBetweenAndEstadoPagoNot(
+                        sucursalId,
+                        inicioMes,
+                        finMes,
+                        EstadoPago.ANULADO);
+
+        List<Venta> ventasAnio =
+                ventaRepository.findBySucursalIdAndFechaVentaBetweenAndEstadoPagoNot(
+                        sucursalId,
+                        inicioAnio,
+                        finAnio,
+                        EstadoPago.ANULADO);
+
+        resumen.setVentasHoy((long) ventasHoy.size());
+        resumen.setVentasSemana((long) ventasSemana.size());
+        resumen.setVentasMes((long) ventasMes.size());
+        resumen.setVentasAnio((long) ventasAnio.size());
+
+        resumen.setIngresosHoy(sumarTotales(ventasHoy));
+        resumen.setIngresosSemana(sumarTotales(ventasSemana));
+        resumen.setIngresosMes(sumarTotales(ventasMes));
+        resumen.setIngresosAnio(sumarTotales(ventasAnio));
+
+        if (resumen.getVentasMes() > 0) {
+
+            resumen.setTicketPromedio(
+
+                    resumen.getIngresosMes().divide(
+                            BigDecimal.valueOf(resumen.getVentasMes()),
+                            2,
+                            RoundingMode.HALF_UP)
+
+            );
+
+        } else {
+
+            resumen.setTicketPromedio(BigDecimal.ZERO);
+
+        }
+
+        return resumen;
     }
 }
