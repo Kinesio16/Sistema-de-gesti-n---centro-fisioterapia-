@@ -39,6 +39,28 @@ public class GlobalExceptionHandler {
     // ===============================
     // Regla de negocio
     // ===============================
+    @ExceptionHandler(FieldValidationException.class)
+    public ResponseEntity<ApiResponseDTO<Map<String, String>>> handleFieldValidation(
+            FieldValidationException ex) {
+
+        Map<String, String> errores = new HashMap<>();
+
+        errores.put(
+                ex.getField(),
+                ex.getMessage()
+        );
+
+        ApiResponseDTO<Map<String, String>> response =
+                new ApiResponseDTO<>();
+
+        response.setSuccess(false);
+        response.setMessage("Error de validación.");
+        response.setData(errores);
+        response.setTimestamp(LocalDateTime.now());
+
+        return ResponseEntity.badRequest().body(response);
+    }
+    
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponseDTO<Object>> handleIllegalArgument(
             IllegalArgumentException ex) {
