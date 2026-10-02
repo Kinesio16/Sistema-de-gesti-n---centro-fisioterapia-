@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.kinesiovitality.common.enums.EstadoRegistro;
+import com.kinesiovitality.common.exception.FieldValidationException;
 import com.kinesiovitality.common.exception.ResourceNotFoundException;
 import com.kinesiovitality.paciente.model.Paciente;
 import com.kinesiovitality.paciente.repository.PacienteRepository;
@@ -22,7 +23,10 @@ public class PacienteServiceImpl implements PacienteService {
     public Paciente guardar(Paciente paciente) {
 
         if (pacienteRepository.existsByCedula(paciente.getCedula())) {
-            throw new IllegalArgumentException("Ya existe un paciente con esa cédula.");
+        	throw new FieldValidationException(
+        		    "cedula",
+        		    "Ya existe un paciente con esa cédula."
+        		);
         }
 
         return pacienteRepository.save(paciente);
@@ -56,9 +60,10 @@ public class PacienteServiceImpl implements PacienteService {
         if (!existente.getCedula().equals(paciente.getCedula())
                 && pacienteRepository.existsByCedula(paciente.getCedula())) {
 
-            throw new IllegalArgumentException(
-                "Ya existe un paciente con esa cédula."
-            );
+        	throw new FieldValidationException(
+        		    "cedula",
+        		    "Ya existe un paciente con esa cédula."
+        		);
         }
 
         existente.setNombres(paciente.getNombres());
